@@ -6,10 +6,10 @@ public class QueryUtils
 {
     public static void DisplayQuery(IEnumerable query, string message)
     {
-        Console.Write($"{message}: ");
+        Console.WriteLine($"{message}:");
         foreach (var x in query)
         {
-            Console.Write($"{x} ");
+            Console.WriteLine($"\t{x}");
         }
         Console.WriteLine("\n");
     }
