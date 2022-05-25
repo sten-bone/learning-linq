@@ -14,12 +14,27 @@ public class QueryUtils
         Console.WriteLine("\n");
     }
 
-    public static IEnumerable<int> CreateIntRange(int start = 0, int stop = 100, int increment = 1)
+    public static IEnumerable<int> CreateIntRange(int start = 0, int stop = 100, int increment = 1, bool inclusive = true)
     {
-        var arr = new int[stop - start];
-        for (var i = start; i < arr.Length; i += increment)
+        var arr = new List<int>();
+        if (inclusive) stop += increment;
+
+        for (var i = start; i < stop; i += increment)
         {
             arr[i] = i;
+        }
+
+        return arr;
+    }
+
+    public static IEnumerable<double> CreateDoubleRange(double start = 0, double stop = 100, double increment = 1, bool inclusive = true)
+    {
+        var arr = new List<double>();
+        if (inclusive) stop += increment;
+
+        for (var i = start; i < stop; i += increment)
+        {
+            arr.Add(i);
         }
 
         return arr;
