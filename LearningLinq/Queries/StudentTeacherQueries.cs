@@ -23,10 +23,9 @@ public class StudentTeacherQueries
         var specificPeopleWithAddressQuery = _students
             .Where(x => x.City == "Seattle")
             .Select(x => $"{x.First} {x.Last} on {x.Street}")
-            .Concat(
-                _teachers
-                    .Where(y => y.City == "Seattle")
-                    .Select(y => $"{y.First} {y.Last} (teacher)")
+            .Concat(_teachers
+                .Where(y => y.City == "Seattle")
+                .Select(y => $"{y.First} {y.Last} (teacher)")
             );
         QueryUtils.DisplayQuery(specificPeopleWithAddressQuery, "More specific people in Seattle");
     }
@@ -35,6 +34,8 @@ public class StudentTeacherQueries
     {
         var studentsToXML = new XElement("Root",
             _students
+                .OrderBy(x => x.Last)
+                .ThenBy(x => x.First)
                 .Select(x => new XElement("student",
                     new XElement("First", x.First),
                     new XElement("Last", x.Last),
@@ -84,6 +85,18 @@ public class StudentTeacherQueries
                 Street="125 Main Street",
                 City="Lake City",
                 Scores= new List<int> { 88, 94, 65, 91 } },
+            new Student { First="Aaron",
+                Last="O'Donnel",
+                ID=114,
+                Street="124 Main Street",
+                City="Redmond",
+                Scores= new List<int> { 63, 81, 77, 76 } },
+            new Student { First="Sylvia",
+                Last="Brown",
+                ID=115,
+                Street="126 Main Street",
+                City="Iowa City",
+                Scores= new List<int> { 99, 94, 95, 91 } },
         };
     }
 
