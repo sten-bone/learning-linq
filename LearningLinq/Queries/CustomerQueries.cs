@@ -68,6 +68,129 @@ public class CustomerQueries
         new OrderDetail(7, 3, 100),
         new OrderDetail(7, 4, 147)
     };
+
+    public static void RunQueries()
+    {
+        // GetCompanyInformation();
+        GetOrderDetails();
+    }
+
+    // get information (name & address) for each company
+    private static void GetCompanyInformation()
+    {
+        Console.WriteLine("Company Information");
+
+        var companyInformationQuery = Companies
+            .Join(PostalCodes, c => c.PostalCode, p => p.Code,
+                (c, p) => new
+                {
+                    c.Name,
+                    c.Street,
+                    p.City,
+                    p.State,
+                    c.PostalCode
+                });
+
+        foreach (var companyInformation in companyInformationQuery)
+        {
+            Console.WriteLine($"{companyInformation.Name}");
+            Console.WriteLine($"{companyInformation.Street}");
+            Console.WriteLine($"{companyInformation.City}, {companyInformation.State} {companyInformation.PostalCode}\n");
+        }
+
+        Console.WriteLine();
+    }
+
+    // query for details of each order
+    private static void GetOrderDetails()
+    {
+        Console.WriteLine("Details of each order\n");
+
+        var companyInformationQuery = Companies
+            .Join(PostalCodes, c => c.PostalCode, p => p.Code,
+                (c, p) => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.Street,
+                    p.City,
+                    p.State,
+                    c.PostalCode
+                });
+
+        var orderProductTotalsQuery = Orders
+            .Join(OrderDetails, o => o.OrderNumber, od => od.OrderNumber,
+                (o, od) => new
+                {
+                    o.OrderNumber,
+                    o.CompanyId,
+                    o.OrderDate,
+                    od.ProductCode,
+                    od.Quantity,
+                })
+            .Join(Products, o => o.ProductCode, p => p.ProductCode,
+                (o, p) => new
+                {
+                    o.OrderNumber,
+                    o.CompanyId,
+                    o.OrderDate,
+                    p.Name,
+                    p.Price,
+                    o.Quantity,
+                    ProductTotal = p.Price * o.Quantity
+                });
+
+        var orderCompanyDetailsQuery = Orders
+            .Join(companyInformationQuery, o => o.CompanyId, c => c.Id,
+                (o, c) => new
+                {
+                    c.Name,
+                    c.Street,
+                    c.City,
+                    c.State,
+                    c.PostalCode,
+                    o.OrderNumber
+                });
+
+        var orderDetailsQuery = orderCompanyDetailsQuery
+            .Join(orderProductTotalsQuery, c => c.OrderNumber, p => p.OrderNumber,
+                (o, p) => new
+                {
+                    CompanyDetails = o,
+                    ProductTotals = p
+                })
+            .GroupBy(x => x.ProductTotals.OrderNumber)
+            .Select(x => new
+            {
+                x.ToList()[0].CompanyDetails,
+                x.ToList()[0].ProductTotals.OrderDate,
+                ProductDetails = x.ToList(),
+                OrderTotal = x.ToList().Sum(y => y.ProductTotals.ProductTotal)
+            });
+
+        foreach (var x in orderDetailsQuery)
+        {
+            var companyDetail = x.CompanyDetails;
+            Console.WriteLine("=============================================================");
+            Console.WriteLine($"| Order on {x.OrderDate:F}");
+            Console.WriteLine($"| {companyDetail.Name}");
+            Console.WriteLine($"| {companyDetail.Street}");
+            Console.WriteLine($"| {companyDetail.City}, {companyDetail.State} {companyDetail.PostalCode}");
+            Console.WriteLine("-------------------------------------------------------------");
+
+            foreach (var product in x.ProductDetails)
+            {
+                var totals = product.ProductTotals;
+                Console.WriteLine($"|\t{totals.Name}: {totals.Quantity} * ${totals.Price} = {totals.ProductTotal:F2}");
+            }
+
+            Console.WriteLine($"|\n|\tTotal: ${x.OrderTotal:F2}\n|");
+
+            Console.WriteLine("=============================================================\n");
+        }
+
+        Console.WriteLine();
+    }
 }
 
 // Record structs

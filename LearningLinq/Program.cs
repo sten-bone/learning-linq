@@ -15,6 +15,7 @@ internal class Program
         //Console.WriteLine("Basic number queries");
         //BasicNumberQueries.RadiusQuery();
 
-        WordCount.Run();
+        // WordCount.Run();
+        CustomerQueries.RunQueries();
     }
 }
