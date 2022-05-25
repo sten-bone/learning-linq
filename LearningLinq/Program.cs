@@ -8,5 +8,6 @@ internal class Program
     {
         Console.WriteLine("Student and Teacher queries:");
         StudentTeacherQueries.Query();
+        StudentTeacherQueries.QueryToXml();
     }
 }

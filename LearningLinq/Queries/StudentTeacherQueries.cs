@@ -1,35 +1,47 @@
-﻿using LearningLinq.Utils;
+﻿using System.Xml.Linq;
+using LearningLinq.Utils;
 
 namespace LearningLinq.Queries;
 
 public class StudentTeacherQueries
 {
+    private static List<Student> _students = CreateStudents();
+    private static List<Teacher> _teachers = CreateTeachers();
     public static void Query()
     {
-        // get data source
-        var students = CreateStudents();
-        var teachers = CreateTeachers();
-
         // query for teachers/students in Seattle
-        var peopleInSeattleQuery = students
+        var peopleInSeattleQuery = _students
             .Where(x => x.City == "Seattle")
             .Select(x => x.Last)
             .Concat(
-                teachers
+                _teachers
                 .Where(y => y.City == "Seattle")
                 .Select(y => y.Last)
             );
         QueryUtils.DisplayQuery(peopleInSeattleQuery, "People in Seattle");
 
-        var specificPeopleWithAddressQuery = students
+        var specificPeopleWithAddressQuery = _students
             .Where(x => x.City == "Seattle")
             .Select(x => $"{x.First} {x.Last} on {x.Street}")
             .Concat(
-                teachers
+                _teachers
                     .Where(y => y.City == "Seattle")
                     .Select(y => $"{y.First} {y.Last} (teacher)")
             );
         QueryUtils.DisplayQuery(specificPeopleWithAddressQuery, "More specific people in Seattle");
+    }
+
+    public static void QueryToXml()
+    {
+        var studentsToXML = new XElement("Root",
+            _students
+                .Select(x => new XElement("student",
+                    new XElement("First", x.First),
+                    new XElement("Last", x.Last),
+                    new XElement("Scores", string.Join(",", x.Scores))
+                ))
+        );
+        Console.WriteLine($"Students to XML:\n{studentsToXML}");
     }
 
     private class Student
