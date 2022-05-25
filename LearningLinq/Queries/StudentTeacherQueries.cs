@@ -5,26 +5,26 @@ namespace LearningLinq.Queries;
 
 public class StudentTeacherQueries
 {
-    private static readonly List<Student> _students = CreateStudents();
-    private static readonly List<Teacher> _teachers = CreateTeachers();
-    private static readonly List<Student> _studentsLong = CreateStudentsLong();
+    private static readonly List<Student> Students = CreateStudents();
+    private static readonly List<Teacher> Teachers = CreateTeachers();
+    private static readonly List<Student> StudentsLong = CreateStudentsLong();
     public static void Query()
     {
         // query for teachers/students in Seattle
-        var peopleInSeattleQuery = _students
+        var peopleInSeattleQuery = Students
             .Where(x => x.City == "Seattle")
             .Select(x => x.Last)
             .Concat(
-                _teachers
+                Teachers
                 .Where(y => y.City == "Seattle")
                 .Select(y => y.Last)
             );
         QueryUtils.DisplayQuery(peopleInSeattleQuery, "People in Seattle");
 
-        var specificPeopleWithAddressQuery = _students
+        var specificPeopleWithAddressQuery = Students
             .Where(x => x.City == "Seattle")
             .Select(x => $"{x.First} {x.Last} on {x.Street}")
-            .Concat(_teachers
+            .Concat(Teachers
                 .Where(y => y.City == "Seattle")
                 .Select(y => $"{y.First} {y.Last} (teacher)")
             );
@@ -34,7 +34,7 @@ public class StudentTeacherQueries
     public static void QueryToXml()
     {
         var studentsToXml = new XElement("Root",
-            _students
+            Students
                 .OrderBy(x => x.Last)
                 .ThenBy(x => x.First)
                 .Select(x => new XElement("student",
@@ -48,7 +48,7 @@ public class StudentTeacherQueries
 
     public static void QueryStudentData()
     {
-        var lastNameGroupedQuery = _studentsLong
+        var lastNameGroupedQuery = StudentsLong
             .GroupBy(x => x.Last[0])
             .OrderBy(x => x.Key);
         foreach (var studentGroup in lastNameGroupedQuery)
@@ -59,6 +59,18 @@ public class StudentTeacherQueries
                 Console.WriteLine($"\t{student.Last}, {student.First}");
             }
         }
+        Console.WriteLine();
+
+        var studentsAverageLessThanFirstScoreQuery = StudentsLong
+            .Select(x => new
+            {
+                Student = x,
+                AverageScore = x.Scores.Average()
+            })
+            .Where(x => x.AverageScore < x.Student.Scores[0])
+            .OrderByDescending(x => x.AverageScore)
+            .Select(x => $"{x.AverageScore:F2}: {x.Student.Last}, {x.Student.First} (First score = {x.Student.Scores[0]})");
+        QueryUtils.DisplayQuery(studentsAverageLessThanFirstScoreQuery, "Students whose average score was less than their first score");
     }
 
     private class Student
