@@ -12,14 +12,9 @@ internal class Program
 
     private static void BasicIntQueries()
     {
-        var scores = new int[100];
-        for (var i = 0; i < scores.Length; i++)
-        {
-            scores[i] = i;
-        }
+        var scores = CreateIntRange();
 
         var greaterThanEightyQuery = scores.Where(x => x > 80);
-
         DisplayQuery(greaterThanEightyQuery, "Greater than 80");
 
 
@@ -33,5 +28,16 @@ internal class Program
             Console.Write($"{x} ");
         }
         Console.WriteLine("\n");
+    }
+
+    private static IEnumerable<int> CreateIntRange(int start = 0, int stop = 100, int increment = 1)
+    {
+        var arr = new int[stop - start];
+        for (var i = start; i < arr.Length; i += increment)
+        {
+            arr[i] = i;
+        }
+
+        return arr;
     }
 }
