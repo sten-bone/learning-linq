@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Collections;
+﻿using LearningLinq.Utils;
 
 namespace LearningLinq;
 
@@ -12,32 +11,14 @@ internal class Program
 
     private static void BasicIntQueries()
     {
-        var scores = CreateIntRange();
+        var scores = QueryUtils.CreateIntRange();
 
         var greaterThanEightyQuery = scores.Where(x => x > 80);
-        DisplayQuery(greaterThanEightyQuery, "Greater than 80");
+        QueryUtils.DisplayQuery(greaterThanEightyQuery, "Greater than 80");
 
+        var toSeven = QueryUtils.CreateIntRange(stop: 7);
+        var queryEvens = toSeven.Where(x => x % 2 == 0);
+        QueryUtils.DisplayQuery(queryEvens, "Even numbers");
 
-    }
-
-    private static void DisplayQuery(IEnumerable query, string message)
-    {
-        Console.Write($"{message}: ");
-        foreach (var x in query)
-        {
-            Console.Write($"{x} ");
-        }
-        Console.WriteLine("\n");
-    }
-
-    private static IEnumerable<int> CreateIntRange(int start = 0, int stop = 100, int increment = 1)
-    {
-        var arr = new int[stop - start];
-        for (var i = start; i < arr.Length; i += increment)
-        {
-            arr[i] = i;
-        }
-
-        return arr;
     }
 }
